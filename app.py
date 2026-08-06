@@ -1,4 +1,3 @@
-Python
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -11,8 +10,8 @@ CORS(app)
 def get_db():
     return mysql.connector.connect(
         host="localhost",
-        user="root",
-        password="your_mysql_password",  # <-- change this
+        user="appuser",
+        password="AppPass123!",  # <-- change this
         database="simple_app"
     )
 
