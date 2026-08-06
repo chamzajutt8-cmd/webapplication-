@@ -1,0 +1,6 @@
+plain
+
+flask
+flask-cors
+mysql-connector-python
+werkzeug
