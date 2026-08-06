@@ -1,6 +1,4 @@
-plain
-
-flask
+Flask
 flask-cors
 mysql-connector-python
-werkzeug
+Werkzeug
