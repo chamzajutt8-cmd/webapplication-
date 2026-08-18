@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 CORS(app)
 
+
 def get_db():
     return mysql.connector.connect(
         host="localhost",
@@ -14,9 +15,11 @@ def get_db():
         database="simple_app"
     )
 
+
 @app.route('/')
 def home():
     return "Hello! Flask is running."
+
 
 @app.route('/api/register', methods=['POST'])
 def register():
@@ -29,7 +32,10 @@ def register():
     cursor = db.cursor()
     try:
         hashed = generate_password_hash(password)
-        cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed))
+        cursor.execute(
+            "INSERT INTO users (username, password) VALUES (%s, %s)",
+            (username, hashed)
+        )
         db.commit()
         return jsonify({'message': 'User created'}), 201
     except mysql.connector.IntegrityError:
@@ -37,6 +43,7 @@ def register():
     finally:
         cursor.close()
         db.close()
+
 
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -52,6 +59,7 @@ def login():
     if user and check_password_hash(user['password'], password):
         return jsonify({'id': user['id'], 'username': user['username']}), 200
     return jsonify({'error': 'Invalid credentials'}), 401
+
 
 @app.route('/api/users', methods=['GET'])
 def get_users():
@@ -71,6 +79,7 @@ def get_users():
     cursor.close()
     db.close()
     return jsonify(users), 200
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
