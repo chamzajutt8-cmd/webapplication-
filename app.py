@@ -1,4 +1,3 @@
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import mysql.connector
@@ -11,19 +10,21 @@ def get_db():
     return mysql.connector.connect(
         host="localhost",
         user="appuser",
-        password="AppPass123!",  # <-- change this
+        password="AppPass123!",
         database="simple_app"
     )
+
+@app.route('/')
+def home():
+    return "Hello! Flask is running."
 
 @app.route('/api/register', methods=['POST'])
 def register():
     data = request.json
     username = data.get('username')
     password = data.get('password')
-
     if not username or not password:
         return jsonify({'error': 'Missing fields'}), 400
-
     db = get_db()
     cursor = db.cursor()
     try:
@@ -42,14 +43,12 @@ def login():
     data = request.json
     username = data.get('username')
     password = data.get('password')
-
     db = get_db()
     cursor = db.cursor(dictionary=True)
     cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
     user = cursor.fetchone()
     cursor.close()
     db.close()
-
     if user and check_password_hash(user['password'], password):
         return jsonify({'id': user['id'], 'username': user['username']}), 200
     return jsonify({'error': 'Invalid credentials'}), 401
@@ -59,17 +58,14 @@ def get_users():
     username = request.headers.get('X-Username')
     if not username:
         return jsonify({'error': 'Unauthorized'}), 401
-
     db = get_db()
     cursor = db.cursor(dictionary=True)
-    
-    # verify user exists
+
     cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
     if not cursor.fetchone():
         cursor.close()
         db.close()
         return jsonify({'error': 'Unauthorized'}), 401
-
     cursor.execute("SELECT id, username, created_at FROM users")
     users = cursor.fetchall()
     cursor.close()
@@ -77,5 +73,4 @@ def get_users():
     return jsonify(users), 200
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
-    
+    app.run(host='0.0.0.0', port=5000, debug=True)
