@@ -5,8 +5,13 @@ on:
     branches: [ main ]
 
 jobs:
+
+  # =========================
+  # BACKEND
+  # =========================
   backend:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -17,13 +22,17 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt flake8 pytest
+        run: |
+          pip install -r requirements.txt
+          pip install flake8 pytest
 
       - name: Lint
-        run: flake8 app.py
+        run: |
+          flake8 app.py
 
       - name: Test
-        run: pytest test_app.py -v
+        run: |
+          pytest test_app.py -v
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -32,29 +41,41 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push backend image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
+          file: ./Dockerfile
           push: true
           tags: chamzajutt8/flask-backend:latest
 
+
+  # =========================
+  # FRONTEND
+  # =========================
   frontend:
     runs-on: ubuntu-latest
     needs: backend
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - - name: Debug frontend files
-  run: |
-    pwd
-    ls -la
-    echo "----- frontend -----"
-    ls -la frontend/
-    echo "----- Dockerfile -----"
-    ls -la frontend/Dockerfile
-    echo "----- Git tracked files -----"
-    git ls-files frontend/
+      - name: Check frontend files
+        run: |
+          echo "Current directory:"
+          pwd
+
+          echo "Project files:"
+          ls -la
+
+          echo "Frontend files:"
+          ls -la frontend/
+
+          echo "Checking Dockerfile:"
+          ls -l frontend/Dockerfile
+
+          echo "Checking package.json:"
+          ls -l frontend/package.json
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -63,16 +84,21 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push frontend image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
           tags: chamzajutt8/flask-frontend:latest
 
+
+  # =========================
+  # GITHUB PAGES
+  # =========================
   deploy-pages:
     runs-on: ubuntu-latest
     needs: frontend
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -80,13 +106,15 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm install
 
       - name: Build frontend
-        run: |
-          cd frontend
-          npm install
-          npm run build
+        working-directory: frontend
+        run: npm run build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
