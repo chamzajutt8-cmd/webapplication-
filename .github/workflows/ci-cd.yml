@@ -4,6 +4,9 @@ on:
   push:
     branches: [ main ]
 
+permissions:
+  contents: write
+
 jobs:
 
   # =========================
@@ -62,19 +65,13 @@ jobs:
 
       - name: Check frontend files
         run: |
-          echo "Current directory:"
-          pwd
-
-          echo "Project files:"
-          ls -la
-
           echo "Frontend files:"
           ls -la frontend/
 
-          echo "Checking Dockerfile:"
+          echo "Dockerfile:"
           ls -l frontend/Dockerfile
 
-          echo "Checking package.json:"
+          echo "Package:"
           ls -l frontend/package.json
 
       - name: Log in to Docker Hub
@@ -93,7 +90,7 @@ jobs:
 
 
   # =========================
-  # GITHUB PAGES
+  # DEPLOY FRONTEND TO GITHUB PAGES
   # =========================
   deploy-pages:
     runs-on: ubuntu-latest
