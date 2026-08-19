@@ -1,20 +1,18 @@
-# Use an official lightweight Python image
-FROM python:3.12-slim
+FROM node:20-alpine AS build
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy only requirements first (for better Docker layer caching)
-COPY requirements.txt .
+COPY package*.json ./
+RUN npm install
 
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the rest of the backend code
 COPY . .
 
-# Expose the port Flask runs on
-EXPOSE 5000
+RUN npm run build
 
-# Command to run when the container starts
-CMD ["python", "app.py"]
+FROM nginx:alpine
+
+COPY --from=build /app/dist /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
