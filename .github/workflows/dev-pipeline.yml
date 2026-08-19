@@ -5,7 +5,7 @@ on:
     branches: [dev]
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -59,3 +59,22 @@ jobs:
           file: ./frontend/Dockerfile
           push: true
           tags: chamzajutt8/frontend-app:dev
+
+  merge-to-main:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Merge dev into main
+        run: |
+          git checkout main
+          git pull origin main
+          git merge origin/dev --no-edit
+          git push origin main
