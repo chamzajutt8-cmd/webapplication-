@@ -89,14 +89,14 @@ jobs:
           path: frontend/dist
 
 
-  deploy:
-  name: Deploy to GitHub Pages
-  needs: build
-  runs-on: ubuntu-latest
+   deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
 
-  permissions:
-    pages: write
-    id-token: write
+    permissions:
+      pages: write
+      id-token: write
 
     environment:
       name: github-pages
