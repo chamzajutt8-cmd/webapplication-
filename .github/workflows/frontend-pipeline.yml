@@ -90,9 +90,13 @@ jobs:
 
 
   deploy:
-    name: Deploy to GitHub Pages
-    needs: build
-    runs-on: ubuntu-latest
+  name: Deploy to GitHub Pages
+  needs: build
+  runs-on: ubuntu-latest
+
+  permissions:
+    pages: write
+    id-token: write
 
     environment:
       name: github-pages
