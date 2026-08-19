@@ -16,11 +16,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install deps & build
+      - name: Install dependencies
         working-directory: ./frontend
-        run: |
-          npm install
-          npm run build
+        run: npm install
+      - name: Lint
+        working-directory: ./frontend
+        run: npm run lint
+      - name: Test
+        working-directory: ./frontend
+        run: npm test --if-present
+      - name: Build
+        working-directory: ./frontend
+        run: npm run build
       - name: Upload artifact
         if: github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v3
