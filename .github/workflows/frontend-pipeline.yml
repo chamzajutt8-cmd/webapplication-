@@ -1,5 +1,7 @@
 name: Frontend Pipeline
 
+# Frontend CI/CD pipeline
+
 on:
   push:
     branches:
