@@ -2,26 +2,27 @@ name: Frontend GitHub Pages
 on:
   push:
     branches: [main]
-
 permissions:
   contents: read
   pages: write
   id-token: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Install deps & build
+        working-directory: ./frontend
         run: |
           npm install
           npm run build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist   # adjust to your actual build output folder
-
+          path: ./frontend/dist
+      - name: List build output
+        working-directory: ./frontend
+        run: ls
   deploy:
     needs: build
     runs-on: ubuntu-latest
