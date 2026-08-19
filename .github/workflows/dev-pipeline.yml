@@ -14,23 +14,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Install dependencies
         working-directory: ./frontend
         run: npm install
-
       - name: Lint
         working-directory: ./frontend
         run: npm run lint
-
       - name: Test
         working-directory: ./frontend
         run: npm test --if-present
-
       - name: Build
         working-directory: ./frontend
         run: npm run build
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
