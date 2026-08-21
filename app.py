@@ -1,25 +1,23 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import mysql.connector
+import os
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 CORS(app)
 
-
 def get_db():
     return mysql.connector.connect(
-        host="localhost",
-        user="appuser",
-        password="AppPass123!",
-        database="simple_app"
+        host=os.environ.get("DB_HOST", "localhost"),
+        user=os.environ.get("DB_USER", "appuser"),
+        password=os.environ.get("DB_PASSWORD", "AppPass123!"),
+        database=os.environ.get("DB_NAME", "simple_app")
     )
-
 
 @app.route('/')
 def home():
     return "Hello! Flask is running."
-
 
 @app.route('/api/register', methods=['POST'])
 def register():
@@ -44,7 +42,6 @@ def register():
         cursor.close()
         db.close()
 
-
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.json
@@ -60,7 +57,6 @@ def login():
         return jsonify({'id': user['id'], 'username': user['username']}), 200
     return jsonify({'error': 'Invalid credentials'}), 401
 
-
 @app.route('/api/users', methods=['GET'])
 def get_users():
     username = request.headers.get('X-Username')
@@ -68,7 +64,6 @@ def get_users():
         return jsonify({'error': 'Unauthorized'}), 401
     db = get_db()
     cursor = db.cursor(dictionary=True)
-
     cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
     if not cursor.fetchone():
         cursor.close()
@@ -80,6 +75,5 @@ def get_users():
     db.close()
     return jsonify(users), 200
 
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)
